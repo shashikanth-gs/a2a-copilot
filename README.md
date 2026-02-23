@@ -5,7 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js >=18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 
-A generic, use-case agnostic **A2A (Agent-to-Agent) protocol** wrapper for the **GitHub Copilot SDK** (`@github/copilot-sdk`). Drop a JSON config file in, get a fully spec-compliant A2A server out.
+GitHub Copilot is a production-grade agent. It already handles multi-step planning, MCP tool execution, context management, and streaming — everything you'd spend months rebuilding from scratch.
+
+**a2a-copilot** exposes it as a standalone, interoperable agent via the [A2A protocol](https://github.com/google-deepmind/a2a). Drop a JSON config file in, get a fully spec-compliant A2A server out. Any orchestrator that speaks A2A can discover and call it — no Copilot-specific integration code required.
+
+> **The pattern:** MCP is the vertical rail — how agents access tools. A2A is the horizontal rail — how agents talk to each other. This library adds the horizontal rail to GitHub Copilot.
 
 **Features:**
 - Full [A2A v0.3.0](https://github.com/google-deepmind/a2a) protocol — Agent Card, JSON-RPC, REST, SSE streaming
@@ -15,6 +19,30 @@ A generic, use-case agnostic **A2A (Agent-to-Agent) protocol** wrapper for the *
 - JSON config file with layered overrides (JSON → env vars → CLI flags)
 - Docker-ready with corporate proxy CA support
 - TypeScript source with full type declarations
+
+## Why not just embed the Copilot SDK directly?
+
+Direct SDK embedding works — but it tightly couples your application to Copilot's session model and integration pattern. Swapping the AI backend means rewriting integration code. Adding a second agent means writing a second bespoke integration.
+
+With the A2A protocol surface:
+- Your orchestrator speaks one interface regardless of what's behind it
+- Copilot becomes **swappable** — replace it without changing orchestration logic
+- Copilot becomes **composable** — route tasks to it alongside other A2A agents
+- Copilot becomes **discoverable** — any A2A-compatible system can find it via Agent Card
+
+## Works with agent frameworks
+
+This library complements — not replaces — frameworks like LangGraph, Google ADK, Microsoft Agent Framework, and CrewAI. Use those frameworks for orchestration, state, and memory control. Use a2a-copilot as the execution node they call.
+
+```
+LangGraph / ADK / Microsoft Agent Framework
+        (state, memory, flow control)
+                    ↓
+              A2A Protocol
+                    ↓
+              a2a-copilot
+           (GitHub Copilot execution)
+```
 
 ## Quick Start
 
